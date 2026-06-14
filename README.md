@@ -1,73 +1,90 @@
 # Video Pre-Launch Check Officer
 
-这是一个基于 [feicaiclub/video-spec-builder](https://github.com/feicaiclub/video-spec-builder) 的个人改造版 Codex skill 项目。
+Video Pre-Launch Check Officer is a Codex skill for preparing videos before they are sent to HyperFrames.
 
-目标是保留原 skill 的核心能力，同时强化“渲染前检查”：先把视频需求、设计范式、分镜脚本和预览表过一遍，用户批准后再交给 HyperFrames 生成视频。
+It helps you turn a rough video idea into a usable production brief: purpose, audience, platform, assets, voiceover, visual direction, pacing, storyboard, and a clear `video-spec.md`. Before rendering, it adds one more checkpoint: a keyframe preview board for approval, so you can catch visual problems before HyperFrames spends time generating the video.
 
-## 当前状态
+## What It Does
 
-- skill 名称已改为 `video-pre-launch-check-officer`，显示名为 Video Pre-Launch Check Officer，避免和已安装的原版 `video-spec-builder` 冲突。
-- 原始 README 已保留在 `docs/README.upstream.md` 和 `docs/README.upstream.zh.md`。
-- 原始 MIT License 已保留。发布到自己的 GitHub 时请继续保留 `LICENSE`。
-- 仓库根目录保留 `SKILL.md`，方便 `npx skills add <your-github>/<repo>` 直接安装。
-- 已加入渲染前预览审批：生成 `video-spec.md` 后先生成 `preview-board.md`，用户批准后再启动 HyperFrames。
+- Turns a vague video idea into a structured video brief.
+- Checks the missing pieces before production: script, audio, footage, images, design references, aspect ratio, duration, and output format.
+- Helps define the visual system before rendering: design style, typography, color, layout density, motion language, and components.
+- Breaks the script into scenes with purpose, on-screen text, expected visuals, movement, transitions, and asset dependencies.
+- Creates `video-spec.md` as the production handoff for HyperFrames.
+- Creates a pre-render approval board before HyperFrames starts rendering.
+- Requires approval before video generation, reducing expensive visual rework.
 
-## 目录结构
+## Pre-Render Approval
+
+The key feature is the checkpoint before rendering.
+
+After the video spec and design direction are ready, the skill must generate:
+
+- `preview-board.md`: a scene-by-scene approval table.
+- Keyframe preview images when visual output is being prepared locally.
+- A short explanation for each scene: what the image will look like and how it will move.
+
+HyperFrames should not start generating the video until the user explicitly approves the preview board.
+
+Approval means the user clearly says something like:
+
+- `通过`
+- `批准`
+- `可以生成`
+- `开始渲染`
+- `OK 按这个做`
+
+If the user asks for changes, the skill goes back and updates the spec, design notes, and preview board first.
+
+## Workflow
+
+1. The user describes the video they want to make.
+2. The skill asks only for missing production-critical details.
+3. The skill checks assets: script, voiceover, footage, images, data, 3D, references, and design rules.
+4. The skill creates or updates `video-spec.md`.
+5. The skill creates `preview-board.md` and keyframe preview guidance before rendering.
+6. The user approves or requests changes.
+7. Only after approval does the workflow move to HyperFrames rendering.
+
+## Install
+
+Install HyperFrames first, then install this skill:
+
+```bash
+npx skills add heygen-com/hyperframes
+npx skills add Winichai/video-pre-launch-check-officer
+```
+
+If you make videos often, install globally:
+
+```bash
+npx skills add heygen-com/hyperframes -g
+npx skills add Winichai/video-pre-launch-check-officer -g
+```
+
+After installation, restart Codex so the skill can be picked up.
+
+## Files
 
 ```text
 .
-├── SKILL.md                  # skill 入口和核心行为说明
-├── templates/                # video-spec.md 输出模板
-├── references/               # 工作流、追问库、节奏规则、组件目录
-├── examples/                 # 示例 video-spec
-├── spec-mono/                # 视觉主题示例
-├── Full Code/                # 原项目附带的完整组件代码
-├── docs/                     # 上游 README 和改造文档
-├── CHANGELOG.md              # 记录你的改造历史
-├── LICENSE                   # MIT 许可证
-└── README.md                 # 当前仓库首页
+├── SKILL.md
+├── templates/
+│   ├── video-spec-template.md
+│   └── preview-board-template.md
+├── references/
+│   ├── workflow-0-1.md
+│   ├── workflow-iteration.md
+│   ├── question-bank.md
+│   ├── preview-approval.md
+│   └── ...
+├── examples/
+├── docs/
+├── CHANGELOG.md
+├── LICENSE
+└── README.md
 ```
-
-## 推荐改造顺序
-
-1. 先改 `SKILL.md` 里的追问风格、工作原则和输出要求。
-2. 再改 `references/question-bank.md`、`references/workflow-0-1.md`、`references/workflow-iteration.md`。
-3. 如果你要改变最终文档格式，再改 `templates/video-spec-template.md`。
-4. 如果你要调整渲染前审批方式，改 `references/preview-approval.md` 和 `templates/preview-board-template.md`。
-5. 每次改完，用一个真实的视频需求测试它能不能产出稳定的 `video-spec.md` 和 `preview-board.md`。
-6. 把变更写进 `CHANGELOG.md`，方便以后回滚或对比。
-
-## 上传到自己的 GitHub
-
-在这个目录中创建 GitHub 仓库后，可以按下面的方式发布：
-
-```powershell
-git init
-git add .
-git commit -m "Create video pre-launch check officer skill"
-git branch -M main
-git remote add origin https://github.com/<your-name>/video-pre-launch-check-officer.git
-git push -u origin main
-```
-
-上传后，安装你的版本：
-
-```powershell
-npx skills add <your-name>/video-pre-launch-check-officer
-```
-
-安装后重启 Codex，让新 skill 生效。
-
-## 如果想覆盖原版名称
-
-当前 `SKILL.md` 使用 `name: video-pre-launch-check-officer`。如果你希望它替代原版，而不是并排存在，可以把名称改回：
-
-```yaml
-name: video-spec-builder
-```
-
-这样做前建议先备份或删除本机已安装的原版，避免安装时目录名冲突。
 
 ## Attribution
 
-This project is based on `feicaiclub/video-spec-builder`, licensed under the MIT License. The original license text is retained in `LICENSE`.
+This project is based on [`feicaiclub/video-spec-builder`](https://github.com/feicaiclub/video-spec-builder), licensed under the MIT License. The original license text is retained in `LICENSE`.
